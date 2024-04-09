@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.vroongcorp'
+version = '1.0-SNAPSHOT'
+archivesBaseName = 'knowk-keycloak-mapper'
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation "org.keycloak:keycloak-admin-client:${keycloakVersion}"
+    implementation "org.keycloak:keycloak-core:${keycloakVersion}"
+    implementation "org.keycloak:keycloak-server-spi:${keycloakVersion}"
+    implementation "org.keycloak:keycloak-server-spi-private:${keycloakVersion}"
+    implementation "org.keycloak:keycloak-services:${keycloakVersion}"
+    implementation "org.keycloak:keycloak-saml-core:${keycloakVersion}"
+    implementation "org.jboss.resteasy:resteasy-client:${resteasyVersion}"
+    implementation "org.jboss.resteasy:resteasy-jackson2-provider:${resteasyVersion}"
+    implementation "org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec:${jbossJaxrsApi21Spec}"
+    implementation "info.picocli:picocli:${picocliVersion}"
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDir file("${buildDir}/src/main/java")
+        }
+    }
+}
+jar {
+    enabled = true
+    from sourceSets.main.output
+}
+
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = archivesBaseName
+            from components.java
+        }
+    }
+}
