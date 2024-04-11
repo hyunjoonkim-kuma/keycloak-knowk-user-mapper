@@ -1,7 +1,9 @@
 package com.vroongcorp;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ProtocolMapperModel;
@@ -13,6 +15,7 @@ import org.keycloak.protocol.oidc.mappers.OIDCIDTokenMapper;
 import org.keycloak.protocol.oidc.mappers.UserInfoTokenMapper;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.IDToken;
+import org.yaml.snakeyaml.Yaml;
 
 public class KnowkUserMapper extends AbstractOIDCProtocolMapper implements OIDCAccessTokenMapper,
     OIDCIDTokenMapper, UserInfoTokenMapper {
@@ -67,13 +70,32 @@ public class KnowkUserMapper extends AbstractOIDCProtocolMapper implements OIDCA
       final KeycloakSession keycloakSession,
       final ClientSessionContext clientSessionCtx) {
 
-    // todo 통신하는 모듈 작업 필요
+    // 환경별로 구분된 YAML 설정 파일에서 REST API URL을 로드
+    //String environment = System.getProperty("keycloak.env", "dev"); // 예: -Dkeycloak.env=prod
+    String restApiUrl = loadRestApiUrl("local");
 
-    // adds our data to the token. Uses the parameters like the claim name which were set by the user
-    // when this protocol mapper was configured in keycloak. Note that the parameters which can
-    // be configured in keycloak for this protocol mapper were set in the static intializer of this class.
-    //
-    // Sets a static "Hello world" string, but we could write a dynamic value like a group attribute here too.
+
+    String currentRealmName = keycloakSession.getContext().getRealm().getName();
+
+    // todo 통신하는 모듈 작업 필요
+    // knowk User 도메인의 user_id 값
+    System.out.println("restApiUrl = " + restApiUrl);
+    System.out.println(
+        "keycloak custom mapper test. getUser userId = " + userSession.getUser().getId());
+
+    System.out.println("currentRealmName = " + currentRealmName);
     OIDCAttributeMapperHelper.mapClaim(token, mappingModel, "hello world");
+  }
+
+  public static String loadRestApiUrl(String environment) {
+    Yaml yaml = new Yaml();
+    try (InputStream in = KnowkUserMapper.class
+        .getClassLoader()
+        .getResourceAsStream("config-" + environment + ".yaml")) {
+      Map<String, Object> data = yaml.load(in);
+      return data.get("restApiUrl") != null ? (String) data.get("restApiUrl") : "local";
+    } catch (Exception e) {
+      return "local";
+    }
   }
 }

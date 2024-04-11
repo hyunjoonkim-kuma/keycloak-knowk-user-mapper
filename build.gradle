@@ -28,6 +28,7 @@ dependencies {
     implementation "org.jboss.resteasy:resteasy-jackson2-provider:${resteasyVersion}"
     implementation "org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec:${jbossJaxrsApi21Spec}"
     implementation "info.picocli:picocli:${picocliVersion}"
+    implementation 'org.yaml:snakeyaml:2.2'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
